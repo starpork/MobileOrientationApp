@@ -24,6 +24,7 @@ public class UserPage extends AppCompatActivity {
     private EditText mFirstName, mLastName, mUsername;
     private String userID, userEmail;
     private boolean isReg;
+    private String cameFrom;
     //database variable
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
@@ -40,6 +41,7 @@ public class UserPage extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             isReg = extras.getBoolean("isReg");
+            cameFrom = extras.getString("cameFrom");
         }
 
         mAuth = FirebaseAuth.getInstance();
@@ -131,6 +133,12 @@ public class UserPage extends AppCompatActivity {
             mUsername.setText(userDetails.getUsername());
         }
 
+
+    }
+    @Override
+    public void onBackPressed()
+    {
+       ToastText("please save user details first");
 
     }
     private void ToastText(String text){

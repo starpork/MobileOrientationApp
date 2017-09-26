@@ -81,6 +81,7 @@ public class HomeScreen extends AppCompatActivity {
         myDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 getUsername(dataSnapshot);
                 //Toast.makeText(UserPage.this,"data change " + dataSnapshot.getValue()  , Toast.LENGTH_SHORT).show();
             }
@@ -122,6 +123,8 @@ public class HomeScreen extends AppCompatActivity {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
+
+
     @Override
     public void onStop() {
         super.onStop();
@@ -131,11 +134,18 @@ public class HomeScreen extends AppCompatActivity {
     }
     private void getUsername(DataSnapshot dataSnapshot){
         for(DataSnapshot snap: dataSnapshot.getChildren()){
-
-
             UserDetails userDetails = new UserDetails();
-            userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
-            tvWelcome.setText("Welcome "+ userDetails.getUsername());
+            if(snap.child(userID).exists()){
+                userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
+
+                tvWelcome.setText("Welcome "+ userDetails.getUsername());
+            }else{
+                Intent intent = new Intent(HomeScreen.this, UserPage.class);
+                intent.putExtra("isReg",true);
+                intent.putExtra("cameFrom","error");
+                startActivity(intent);
+            }
+
         }
 
 
