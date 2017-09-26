@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "95617404888",
+    "firebase_url": "https://mobile-orientation.firebaseio.com",
+    "project_id": "mobile-orientation",
+    "storage_bucket": "mobile-orientation.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95617404888:android:3a2a9a6241736264",
+        "android_client_info": {
+          "package_name": "com.orientation.mobile.mobileorientation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "95617404888-jcukoiubb5f5ladsb4pprhe9kkmhcbck.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.orientation.mobile.mobileorientation",
+            "certificate_hash": "52db6a47314f482bde277884ca042f6332cd59e8"
+          }
+        },
+        {
+          "client_id": "95617404888-ot00nprqnti81e2rkq4rbkaa93gjsoto.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyADSYAjRw3LCBchnyZ-381FR-w1zokHVE4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "95617404888-ot00nprqnti81e2rkq4rbkaa93gjsoto.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
