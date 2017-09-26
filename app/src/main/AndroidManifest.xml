@@ -3,6 +3,7 @@
     package="com.orientation.mobile.mobileorientation">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -21,7 +22,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".UserPage" />
-        <activity android:name=".HomeScreen"></activity>
+        <activity android:name=".HomeScreen" />
+        <activity android:name=".QRActivity"></activity>
     </application>
 
 </manifest>

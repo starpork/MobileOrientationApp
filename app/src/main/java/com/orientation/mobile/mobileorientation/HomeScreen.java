@@ -1,8 +1,12 @@
 package com.orientation.mobile.mobileorientation;
 
+import android.*;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.Image;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -12,6 +16,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.barcode.Barcode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +28,8 @@ import com.google.firebase.database.ValueEventListener;
 import org.w3c.dom.Text;
 
 public class HomeScreen extends AppCompatActivity {
-
+    public static final int PERMISSION_REQUEST = 200;
+    public static final int REQUEST_CODE = 100;
     //database variable
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
@@ -33,10 +39,14 @@ public class HomeScreen extends AppCompatActivity {
 
     private TextView tvWelcome;
     private ImageButton btnLogout, btnUserDetails;
+    Button scanButton;
+    TextView qrCodeResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
+        qrCodeResult = (TextView) findViewById(R.id.scanRes);
+        scanButton = (Button) findViewById(R.id.scan);
         tvWelcome = (TextView)findViewById(R.id.welcome);
         btnLogout = (ImageButton)findViewById(R.id.logoutButton) ;
         btnUserDetails = (ImageButton)findViewById(R.id.userButton) ;
@@ -45,6 +55,10 @@ public class HomeScreen extends AppCompatActivity {
         myDatabaseRef = mFirebaseDatabase.getReference();
         FirebaseUser user = mAuth.getCurrentUser();
         userID=user.getUid();
+
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, PERMISSION_REQUEST);
+        }
 
 
 
@@ -94,7 +108,14 @@ public class HomeScreen extends AppCompatActivity {
             }
         });
 
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(HomeScreen.this, QRActivity.class);
+                startActivityForResult(intent, REQUEST_CODE);
 
+            }
+        });
     }
     @Override
     public void onStart() {
@@ -115,6 +136,32 @@ public class HomeScreen extends AppCompatActivity {
             UserDetails userDetails = new UserDetails();
             userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
             tvWelcome.setText("Welcome "+ userDetails.getUsername());
+        }
+
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(requestCode == REQUEST_CODE){
+
+            if (resultCode == RESULT_OK){
+                if (data!= null){
+                    final Barcode barcode = data.getParcelableExtra("barcode");
+//                    qrCodeResult.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            qrCodeResult.setText(barcode.displayValue);
+//                        }
+//                    });
+                    qrCodeResult.setText(barcode.displayValue);
+                }else{
+                    qrCodeResult.setText("No QR code found");
+                }
+            }
+        }else{
+            super.onActivityResult(requestCode, resultCode, data);
+
         }
 
 
