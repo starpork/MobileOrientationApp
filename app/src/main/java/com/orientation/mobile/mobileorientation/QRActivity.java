@@ -89,7 +89,8 @@ public class QRActivity extends AppCompatActivity {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if(barcodes.size()>0){
-                    Intent intent = new Intent();
+                    //Intent intent = new Intent();
+                    Intent intent = new Intent(QRActivity.this,HomeScreen.class);
                     intent.putExtra("barcode" , barcodes.valueAt(0));
                     setResult(RESULT_OK, intent);
                     finish();

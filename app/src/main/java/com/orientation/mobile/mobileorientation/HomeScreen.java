@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -133,19 +134,26 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
     private void getUsername(DataSnapshot dataSnapshot){
-        for(DataSnapshot snap: dataSnapshot.getChildren()){
+        boolean found=false;
+        for(DataSnapshot snap: dataSnapshot.child("users").getChildren()){
             UserDetails userDetails = new UserDetails();
-            if(snap.child(userID).exists()){
-                userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
+            Log.d("here","here");
+            String currentUser = snap.getKey();
+            if(currentUser.equals(userID)){
+                found=true;
+                userDetails.setUsername(snap.getValue(UserDetails.class).getUsername());
 
                 tvWelcome.setText("Welcome "+ userDetails.getUsername());
             }else{
-                Intent intent = new Intent(HomeScreen.this, UserPage.class);
-                intent.putExtra("isReg",true);
-                intent.putExtra("cameFrom","error");
-                startActivity(intent);
+
             }
 
+        }
+        if (!found){
+            Intent intent = new Intent(HomeScreen.this, UserPage.class);
+            intent.putExtra("isReg",true);
+            intent.putExtra("cameFrom","error");
+            startActivity(intent);
         }
 
 

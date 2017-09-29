@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -121,16 +122,19 @@ public class UserPage extends AppCompatActivity {
     }
     private void getUserDetails(DataSnapshot dataSnapshot){
         for(DataSnapshot snap: dataSnapshot.getChildren()){
-            UserDetails userDetails = new UserDetails();
+            if(snap.getKey().toString().equals("users")){
+                UserDetails userDetails = new UserDetails();
+                Log.d(snap.child(userID).toString(),"here");
+                userDetails.setFirstName(snap.child(userID).getValue(UserDetails.class).getFirstName());
+                userDetails.setLastName(snap.child(userID).getValue(UserDetails.class).getLastName());
+                userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
 
-            userDetails.setFirstName(snap.child(userID).getValue(UserDetails.class).getFirstName());
-            userDetails.setLastName(snap.child(userID).getValue(UserDetails.class).getLastName());
-            userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
 
+                mFirstName.setText(userDetails.getFirstName());
+                mLastName.setText(userDetails.getLastName());
+                mUsername.setText(userDetails.getUsername());
+            }
 
-            mFirstName.setText(userDetails.getFirstName());
-            mLastName.setText(userDetails.getLastName());
-            mUsername.setText(userDetails.getUsername());
         }
 
 

@@ -23,7 +23,10 @@
         </activity>
         <activity android:name=".UserPage" />
         <activity android:name=".HomeScreen" />
-        <activity android:name=".QRActivity"></activity>
+        <activity android:name=".QRActivity" />
+        <activity
+            android:name=".Instructions"
+            android:label="@string/title_activity_instructions"></activity>
     </application>
 
 </manifest>
