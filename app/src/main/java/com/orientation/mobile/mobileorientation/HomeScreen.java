@@ -113,9 +113,10 @@ public class HomeScreen extends AppCompatActivity {
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeScreen.this, QRActivity.class);
-                startActivityForResult(intent, REQUEST_CODE);
-
+//                Intent intent = new Intent(HomeScreen.this, QRActivity.class);
+//                startActivityForResult(intent, REQUEST_CODE);
+                Intent intent = new Intent(HomeScreen.this, Instructions.class);
+                startActivity(intent);
             }
         });
     }
