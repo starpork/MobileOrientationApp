@@ -1,8 +1,12 @@
 package com.orientation.mobile.mobileorientation;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +19,9 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
@@ -42,13 +48,14 @@ public class Instructions extends AppCompatActivity {
     private String userID;
     private FirebaseStorage mFirebaseStorage;
     private StorageReference myStorageRef;
-    private TextView tvWelcome;
+    private TextView loading;
+    private Button scanDestination;
     private ImageButton btnLogout, btnUserDetails, btnRight, btnLeft;
     private ViewFlipper flipper;
-    private int imageIndex=1;
-    private int instructionIndex=1;
-    private int numberOfInstructions=0;
-
+    private String startPoint, destination;
+    DataSnapshot data;
+    private CharSequence[] destiny;
+    private boolean hasJustStarted;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +65,8 @@ public class Instructions extends AppCompatActivity {
         btnRight = (ImageButton)findViewById(R.id.rightButton);
         btnLeft = (ImageButton)findViewById(R.id.leftButton);
         flipper = (ViewFlipper)findViewById(R.id.flipper);
-
+        scanDestination = (Button) findViewById(R.id.flipButton) ;
+        loading = (TextView) findViewById(R.id.loading);
         mAuth = FirebaseAuth.getInstance();
 
         mFirebaseDatabase =FirebaseDatabase.getInstance();
@@ -67,7 +75,17 @@ public class Instructions extends AppCompatActivity {
         myStorageRef = mFirebaseStorage.getReference();
         FirebaseUser user = mAuth.getCurrentUser();
         userID=user.getUid();
-
+        Intent intentExtras = getIntent();
+        if(intentExtras.hasExtra("destinations")){
+             destiny = intentExtras.getCharSequenceArrayExtra("destinations") ;
+        }
+        if(intentExtras.hasExtra("startPoint")){
+            startPoint = intentExtras.getStringExtra("startPoint") ;
+        }
+        if(intentExtras.hasExtra("destination")){
+            destination = intentExtras.getStringExtra("destination") ;
+        }
+        hasJustStarted = intentExtras.getBooleanExtra("justStarted",true);
         String[] args={};
         Image[] images={};
 
@@ -115,11 +133,17 @@ public class Instructions extends AppCompatActivity {
                 // ...
             }
         };
+
         myDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                data = dataSnapshot;
+                if (hasJustStarted){
+                    setupAlert(dataSnapshot);
+                }else{
+                    setupInstructions(dataSnapshot,startPoint,destination);
+                }
 
-               setupInstructions(dataSnapshot);
                 //Toast.makeText(UserPage.this,"data change " + dataSnapshot.getValue()  , Toast.LENGTH_SHORT).show();
             }
 
@@ -158,18 +182,33 @@ public class Instructions extends AppCompatActivity {
         });
 
     }
-    public void setupInstructions(DataSnapshot dataSnapshot){
+    public void setupAlert(final DataSnapshot dataSnapshot){
+        AlertDialog.Builder builder = new AlertDialog.Builder(Instructions.this);
+        builder.setTitle("Pick a destination");
+
+        builder.setItems(destiny, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                destination = destiny[which].toString();
+                setupInstructions(dataSnapshot,startPoint,destination);
+            }
+        });
+        builder.show();
+    }
+    public void setupInstructions(DataSnapshot dataSnapshot, String start, String end){
+
         for(DataSnapshot startLocations: dataSnapshot.child("routes").getChildren()){
             UserDetails userDetails = new UserDetails();
-            if (startLocations.getKey().toString().equals("hsb1")){
+            if (startLocations.getKey().toString().equals(start)){
                 for(DataSnapshot destinations: startLocations.getChildren()){
-                    if (destinations.getKey().toString().equals("hsb316")){
+                    if (destinations.getKey().toString().equals(end)){
                         ImageView image;
                         TextView text;
-                        Button scanDestination;
+
                         for(DataSnapshot instructions: destinations.getChildren()){
                             StorageReference storageReference;
                             if(instructions.getValue().toString().endsWith(".jpg")){
+
                                 storageReference = FirebaseStorage.getInstance().getReference().child(instructions.getValue().toString());
                                 image = new ImageView(Instructions.this);
                                 Glide.with(this)
@@ -178,22 +217,42 @@ public class Instructions extends AppCompatActivity {
                                         .into(image );
                                 flipper.addView(image);
                             }else{
+
                                 text = new TextView(Instructions.this);
                                 text.setText(instructions.getValue().toString());
                                 text.setTextSize(40);
+                                text.setBackgroundColor(Color.parseColor("#303030"));
                                 flipper.addView(text);
                             }
                         }
-                        scanDestination = new Button(Instructions.this);
-                        scanDestination.setText("scan QR code at destination");
+
+
+
+
+                        //testLP.addRule(RelativeLayout.CENTER_IN_PARENT);
                         scanDestination.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
+                        scanDestination.setBackgroundDrawable( getResources().getDrawable(R.drawable.round_button) );
+                        scanDestination.setVisibility(View.VISIBLE);
+                        scanDestination.setText("scan QR code at destination");                //scanDestination.setLayoutParams(params);
+
+
+
+
+
+
+
                         scanDestination.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
 
+                               Intent intent = new Intent(Instructions.this,QRActivity.class);
+                                intent.putExtra("isDestination",true);
+                                intent.putExtra("destination",destination);
+                                intent.putExtra("startPoint",startPoint);
                             }
                         });
-                        flipper.addView(scanDestination);
+                        flipper.setDisplayedChild(1);
+
                     }
                 }
             }
@@ -220,27 +279,38 @@ public class Instructions extends AppCompatActivity {
                 x1 = event.getX();
                 break;
             case MotionEvent.ACTION_UP:
+
                 x2 = event.getX();
                 float deltaX = x2 - x1;
-
+                ToastText((flipper.getChildAt(flipper.getDisplayedChild())).getClass().getSimpleName().toString());
                 if (Math.abs(deltaX) > MIN_DISTANCE)
                 {
                     // Left to Right swipe action
                     if (x2 > x1)
                     {
+                        flipper.setInAnimation(this, R.anim.slide_in_right);
+                        flipper.setOutAnimation(this, R.anim.slide_out_right);
                        flipper.showPrevious();
                     }
 
                     // Right to left swipe action
                     else
                     {
+                        flipper.setInAnimation(this, R.anim.slide_in_left);
+                        flipper.setOutAnimation(this, R.anim.slide_out_left);
                         flipper.showNext();
                     }
 
                 }
-                else
+//
+                else if(((flipper.getChildAt(flipper.getDisplayedChild())).getClass().getSimpleName().toString()).equals("RelativeLayout"))
                 {
-                    // consider as something else - a screen tap for example
+                    //scanDestination.getTop
+                    Intent intent = new Intent(Instructions.this,QRActivity.class);
+                    intent.putExtra("isDestination",true);
+                    intent.putExtra("destination",destination);
+                    intent.putExtra("startPoint",startPoint);
+                    startActivity(intent);
                 }
                 break;
         }
@@ -252,5 +322,8 @@ public class Instructions extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+    private void ToastText(String text){
+        Toast.makeText(Instructions.this,text, Toast.LENGTH_SHORT).show();
     }
 }

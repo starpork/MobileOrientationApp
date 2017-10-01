@@ -79,6 +79,8 @@ public class HomeScreen extends AppCompatActivity {
                 // ...
             }
         };
+
+
         myDatabaseRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -92,7 +94,6 @@ public class HomeScreen extends AppCompatActivity {
 
             }
         });
-
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,8 +116,12 @@ public class HomeScreen extends AppCompatActivity {
             public void onClick(View view) {
 //                Intent intent = new Intent(HomeScreen.this, QRActivity.class);
 //                startActivityForResult(intent, REQUEST_CODE);
-                Intent intent = new Intent(HomeScreen.this, Instructions.class);
+//                Intent intent = new Intent(HomeScreen.this, Instructions.class);
+//                startActivity(intent);
+                Intent intent = new Intent(HomeScreen.this, QRActivity.class);
+                intent.putExtra("isDestination",false);
                 startActivity(intent);
+
             }
         });
     }
