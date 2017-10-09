@@ -24,7 +24,8 @@
         <activity android:name=".UserPage" />
         <activity android:name=".HomeScreen" />
         <activity android:name=".QRActivity" />
-        <activity android:name=".Instructions"></activity>
+        <activity android:name=".Instructions" />
+        <activity android:name=".LocationComment"></activity>
     </application>
 
 </manifest>
