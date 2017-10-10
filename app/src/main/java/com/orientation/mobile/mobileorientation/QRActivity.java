@@ -34,6 +34,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class QRActivity extends AppCompatActivity {
 
@@ -45,9 +47,10 @@ public class QRActivity extends AppCompatActivity {
     }
     CameraSource cameraSource;
     SurfaceHolder holder;
-    private String startPoint, destination;
+    private String startPoint, destination, mDestinations;
     private Boolean isDestination;
     private FirebaseDatabase mFirebaseDatabase;
+
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference myDatabaseRef;
@@ -195,11 +198,26 @@ public class QRActivity extends AppCompatActivity {
                             startActivity(intent);
                         }else{
                             //ToastText("Congratulations, you reached our destination");
+                            myDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    mDestinations = snapshot.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").getValue().toString();
+                                    updateDestinations(destination);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+
+                            });
+                            //this is where you will want to go to the comment activity
                             Intent intent = new Intent(QRActivity.this,HomeScreen.class);
                             intent.putExtra("barcode" , barcode.displayValue);
                             intent.putExtra("destination", destination);
                             intent.putExtra("startPoint",startPoint);
                             intent.putExtra("justStarted",false);
+
                             startActivity(intent);
                         }
 
@@ -215,6 +233,8 @@ public class QRActivity extends AppCompatActivity {
                                     destiny[i] = endPoints.getKey().toString();
                                     i++;
                                 }
+
+
 
                                 Intent intent = new Intent(QRActivity.this, Instructions.class);
                                 intent.putExtra("destinations", destiny);
@@ -232,6 +252,23 @@ public class QRActivity extends AppCompatActivity {
         });
 
 
+    }
+    private void updateDestinations(String destination){
+        if(mDestinations.equals("")){
+            myDatabaseRef.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").setValue(destination);
+            return;
+        }
+        String[] unlockedDestinations = mDestinations.split(" ");
+        Boolean beenToBefore = false;
+        for (String s :unlockedDestinations ) {
+            if(s.equals(destination)){
+                beenToBefore=true;
+            }
+        }
+        if (beenToBefore==false){
+            mDestinations = mDestinations + " " + destination;
+            myDatabaseRef.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").setValue(mDestinations);
+        }
     }
     private void ToastText(String text){
         Toast.makeText(QRActivity.this,text, Toast.LENGTH_SHORT).show();

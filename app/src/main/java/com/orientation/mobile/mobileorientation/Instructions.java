@@ -3,18 +3,15 @@ package com.orientation.mobile.mobileorientation;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -25,7 +22,6 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.Resource;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -51,6 +47,7 @@ public class Instructions extends AppCompatActivity {
     private TextView loading;
     private Button scanDestination;
     private ImageButton btnLogout, btnUserDetails, btnRight, btnLeft;
+    private RelativeLayout btnFlip;
     private ViewFlipper flipper;
     private String startPoint, destination;
     DataSnapshot data;
@@ -67,6 +64,7 @@ public class Instructions extends AppCompatActivity {
         flipper = (ViewFlipper)findViewById(R.id.flipper);
         scanDestination = (Button) findViewById(R.id.flipButton) ;
         loading = (TextView) findViewById(R.id.loading);
+        btnFlip = (RelativeLayout) findViewById(R.id.buttonFlip);
         mAuth = FirebaseAuth.getInstance();
 
         mFirebaseDatabase =FirebaseDatabase.getInstance();
@@ -171,12 +169,18 @@ public class Instructions extends AppCompatActivity {
         btnRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                flipper.setInAnimation(Instructions.this, R.anim.slide_in_left);
+                flipper.setOutAnimation(Instructions.this, R.anim.slide_out_left);
+                flipper.showNext();
 
             }
         });
         btnLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                flipper.setInAnimation(Instructions.this, R.anim.slide_in_right);
+                flipper.setOutAnimation(Instructions.this, R.anim.slide_out_right);
+                flipper.showPrevious();
 
             }
         });
@@ -233,8 +237,17 @@ public class Instructions extends AppCompatActivity {
                         scanDestination.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
                         scanDestination.setBackgroundDrawable( getResources().getDrawable(R.drawable.round_button) );
                         scanDestination.setVisibility(View.VISIBLE);
-                        scanDestination.setText("scan QR code at destination");                //scanDestination.setLayoutParams(params);
-
+                        scanDestination.setText("tap to begin scanning a QR code at the destination");                //scanDestination.setLayoutParams(params);
+//                        btnFlip.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//
+//                                Intent intent = new Intent(Instructions.this,QRActivity.class);
+//                                intent.putExtra("isDestination",true);
+//                                intent.putExtra("destination",destination);
+//                                intent.putExtra("startPoint",startPoint);
+//                            }
+//                        });
 
 
 
@@ -245,10 +258,11 @@ public class Instructions extends AppCompatActivity {
                             @Override
                             public void onClick(View view) {
 
-                               Intent intent = new Intent(Instructions.this,QRActivity.class);
+                                Intent intent = new Intent(Instructions.this,QRActivity.class);
                                 intent.putExtra("isDestination",true);
                                 intent.putExtra("destination",destination);
                                 intent.putExtra("startPoint",startPoint);
+                                startActivity(intent);
                             }
                         });
                         flipper.setDisplayedChild(1);
@@ -303,15 +317,7 @@ public class Instructions extends AppCompatActivity {
 
                 }
 //
-                else if(((flipper.getChildAt(flipper.getDisplayedChild())).getClass().getSimpleName().toString()).equals("RelativeLayout"))
-                {
-                    //scanDestination.getTop
-                    Intent intent = new Intent(Instructions.this,QRActivity.class);
-                    intent.putExtra("isDestination",true);
-                    intent.putExtra("destination",destination);
-                    intent.putExtra("startPoint",startPoint);
-                    startActivity(intent);
-                }
+
                 break;
         }
         return super.onTouchEvent(event);

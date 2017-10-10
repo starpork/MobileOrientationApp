@@ -8,8 +8,8 @@
 
     <TextView
         android:id="@+id/welcome"
-        android:layout_width="240dp"
-        android:layout_height="110dp"
+        android:layout_width="288dp"
+        android:layout_height="66dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:textAlignment="center"
@@ -26,9 +26,6 @@
         android:id="@+id/bottomNav"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
@@ -48,7 +45,8 @@
         app:layout_constraintTop_toTopOf="@+id/bottomNav"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/bottomNav"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp" />
 
     <ImageButton
         android:id="@+id/logoutButton"
@@ -61,7 +59,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/bottomNav"
         app:layout_constraintRight_toRightOf="@+id/bottomNav"
         app:layout_constraintTop_toTopOf="@+id/bottomNav"
-        app:srcCompat="@mipmap/ic_exit_to_app_white_36dp" />
+        app:srcCompat="@mipmap/ic_exit_to_app_white_36dp"
+        android:layout_marginEnd="16dp" />
 
     <Button
         android:id="@+id/scan"
@@ -73,23 +72,58 @@
         android:layout_marginLeft="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNav" />
+        app:layout_constraintBottom_toTopOf="@+id/bottomNav"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <TextView
-        android:id="@+id/scanRes"
-        android:layout_width="196dp"
-        android:layout_height="107dp"
-        android:layout_marginBottom="8dp"
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
+        android:text="Places I Have Navigated To"
         android:textAlignment="center"
-        android:textSize="24sp"
-        app:layout_constraintBottom_toBottomOf="@+id/scan"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/welcome"
-        app:layout_constraintVertical_bias="0.502" />
+        app:layout_constraintTop_toBottomOf="@+id/welcome" />
+
+
+    <TextView
+        android:id="@+id/emptyList"
+        android:layout_width="137dp"
+        android:layout_height="51dp"
+        android:text="currently have not navigated to any locations yet "
+        android:textAlignment="center"
+        app:layout_constraintTop_toTopOf="@+id/visitedView"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/visitedView"
+        android:layout_marginBottom="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="@+id/visitedView"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="@+id/visitedView" />
+
+    <ListView
+        android:id="@+id/visitedView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="48dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="8dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/scan"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="1.0" />
 
 </android.support.constraint.ConstraintLayout>
