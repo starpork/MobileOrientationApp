@@ -11,9 +11,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,15 +42,17 @@ public class HomeScreen extends AppCompatActivity {
     private DatabaseReference myDatabaseRef;
     private String userID;
 
-    private TextView tvWelcome;
+    private TextView tvWelcome, emptyList;
     private ImageButton btnLogout, btnUserDetails;
+    private ListView visitedView;
     Button scanButton;
     TextView qrCodeResult;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
-        qrCodeResult = (TextView) findViewById(R.id.scanRes);
+        emptyList = (TextView) findViewById(R.id.emptyList);
+        visitedView = (ListView) findViewById(R.id.visitedView);
         scanButton = (Button) findViewById(R.id.scan);
         tvWelcome = (TextView)findViewById(R.id.welcome);
         btnLogout = (ImageButton)findViewById(R.id.logoutButton) ;
@@ -57,10 +63,13 @@ public class HomeScreen extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         userID=user.getUid();
 
+
+
+
+
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, PERMISSION_REQUEST);
         }
-
 
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -86,6 +95,7 @@ public class HomeScreen extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 getUsername(dataSnapshot);
+                setupList(dataSnapshot);
                 //Toast.makeText(UserPage.this,"data change " + dataSnapshot.getValue()  , Toast.LENGTH_SHORT).show();
             }
 
@@ -139,6 +149,38 @@ public class HomeScreen extends AppCompatActivity {
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
+
+
+    protected void setupList(DataSnapshot dataSnapshot){
+        String visited= dataSnapshot.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").getValue().toString();
+
+        String[] DynamicListElements;
+
+
+        if(visited.equals("")){
+            emptyList.setVisibility(View.VISIBLE);
+            DynamicListElements = new String[]{};
+        }else{
+            emptyList.setVisibility(View.INVISIBLE);
+            DynamicListElements = visited.split(" ");
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (HomeScreen.this, android.R.layout.simple_list_item_1, DynamicListElements);
+        visitedView.setAdapter(adapter);
+        visitedView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                //when an item is selected, possibly show the latest comment
+
+            }
+
+
+        });
+    }
+
     private void getUsername(DataSnapshot dataSnapshot){
         boolean found=false;
         for(DataSnapshot snap: dataSnapshot.child("users").getChildren()){

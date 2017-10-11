@@ -27,6 +27,7 @@ public class UserPage extends AppCompatActivity {
     private boolean isReg;
     private String cameFrom;
     //database variable
+    private String mDestinations = "";
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -93,7 +94,7 @@ public class UserPage extends AppCompatActivity {
                 String lastName = mLastName.getText().toString().trim();
 
                 if(!username.equals("")&&!firstName.equals("")&&!lastName.equals("")){
-                    UserDetails userDetails = new UserDetails(firstName,lastName,username,userEmail);
+                    UserDetails userDetails = new UserDetails(firstName,lastName,username,userEmail,mDestinations);
                     myDatabaseRef.child("users").child(userID).setValue(userDetails);
                     mFirstName.setText("");
                     mLastName.setText("");
@@ -125,11 +126,13 @@ public class UserPage extends AppCompatActivity {
             if(snap.getKey().toString().equals("users")){
                 UserDetails userDetails = new UserDetails();
                 Log.d(snap.child(userID).toString(),"here");
+//                mDestinations = snap.child(userID).getValue(UserDetails.class).getDestinations();
+//                ToastText(mDestinations);
                 userDetails.setFirstName(snap.child(userID).getValue(UserDetails.class).getFirstName());
                 userDetails.setLastName(snap.child(userID).getValue(UserDetails.class).getLastName());
                 userDetails.setUsername(snap.child(userID).getValue(UserDetails.class).getUsername());
-
-
+                userDetails.setDestinations(snap.child(userID).getValue(UserDetails.class).getDestinations());
+                mDestinations = userDetails.getDestinations();
                 mFirstName.setText(userDetails.getFirstName());
                 mLastName.setText(userDetails.getLastName());
                 mUsername.setText(userDetails.getUsername());
