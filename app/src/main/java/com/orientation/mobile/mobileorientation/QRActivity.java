@@ -212,7 +212,7 @@ public class QRActivity extends AppCompatActivity {
 
                             });
                             //this is where you will want to go to the comment activity
-                            Intent intent = new Intent(QRActivity.this,HomeScreen.class);
+                            Intent intent = new Intent(QRActivity.this,LocationComment.class);
                             intent.putExtra("barcode" , barcode.displayValue);
                             intent.putExtra("destination", destination);
                             intent.putExtra("startPoint",startPoint);
