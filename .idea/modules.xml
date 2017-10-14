@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/MobileOrientation.iml" filepath="$PROJECT_DIR$/MobileOrientation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MobileOrientationApp.iml" filepath="$PROJECT_DIR$/MobileOrientationApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
