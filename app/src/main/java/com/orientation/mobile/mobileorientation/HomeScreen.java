@@ -1,12 +1,14 @@
 package com.orientation.mobile.mobileorientation;
 
 import android.*;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.Image;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +43,9 @@ public class HomeScreen extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference myDatabaseRef;
     private String userID;
+
+    String userComment = "";
+    String userName = "";
 
     private TextView tvWelcome, emptyList;
     private ImageButton btnLogout, btnUserDetails;
@@ -154,7 +159,7 @@ public class HomeScreen extends AppCompatActivity {
     protected void setupList(DataSnapshot dataSnapshot){
         String visited= dataSnapshot.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").getValue().toString();
 
-        String[] DynamicListElements;
+        final String[] DynamicListElements;
 
 
         if(visited.equals("")){
@@ -172,7 +177,40 @@ public class HomeScreen extends AppCompatActivity {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
+                                    int position, final long id) {
+
+
+                myDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+
+
+                        for (DataSnapshot comment : snapshot.child("comments").child(DynamicListElements[(int)id]).getChildren()) {
+                            String s = comment.toString();
+                            String x="";
+                            String key = comment.getKey();
+                            userName = snapshot.child("users").child(key).child("username").getValue().toString();
+                            userComment = comment.getValue().toString();
+                        }
+                        AlertDialog alertDialog = new AlertDialog.Builder(HomeScreen.this).create();
+                        alertDialog.setTitle("Comment at " + DynamicListElements[(int)id]);
+                        alertDialog.setMessage(userName + " left a comment here: "+userComment);
+                        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        alertDialog.show();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+
+                });
+
                 //when an item is selected, possibly show the latest comment
 
             }

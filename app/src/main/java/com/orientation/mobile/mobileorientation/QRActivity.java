@@ -55,6 +55,7 @@ public class QRActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference myDatabaseRef;
     private DataSnapshot data;
+    private boolean foundQR=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -182,69 +183,71 @@ public class QRActivity extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-                if(barcodes.size()>0){
-                    //Intent intent = new Intent();
-                    if(isDestination){
+                if (!foundQR) {
+                    final SparseArray<Barcode> barcodes = detections.getDetectedItems();
+                    if (barcodes.size() > 0) {
+                        //Intent intent = new Intent();
+                        foundQR=true;
+                        if (isDestination) {
 
-                        Barcode barcode = barcodes.valueAt(0);
-                        if(!destination.equals(barcode.displayValue)){
-                            //ToastText("This is not the destination");
-                            Intent intent = new Intent(QRActivity.this,Instructions.class);
-                            intent.putExtra("justStarted",false);
-                            intent.putExtra("destination", destination);
-                            intent.putExtra("startPoint",startPoint);
-                            //intent.putExtra("barcode" , barcode.displayValue);
-                            startActivity(intent);
-                        }else{
-                            //ToastText("Congratulations, you reached our destination");
-                            myDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot snapshot) {
-                                    mDestinations = snapshot.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").getValue().toString();
-                                    updateDestinations(destination);
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-
-                            });
-                            //this is where you will want to go to the comment activity
-                            Intent intent = new Intent(QRActivity.this,LocationComment.class);
-                            intent.putExtra("barcode" , barcode.displayValue);
-                            intent.putExtra("destination", destination);
-                            intent.putExtra("startPoint",startPoint);
-                            intent.putExtra("justStarted",false);
-
-                            startActivity(intent);
-                        }
-
-                    }else {
-                        final String startBarcode = barcodes.valueAt(0).displayValue;
-                        //final CharSequence destinations[] = new CharSequence[5];
-                        for (DataSnapshot startLocations : data.child("routes").getChildren()) {
-                            if (startLocations.getKey().toString().equals(startBarcode)) {
-                                int i =0;
-                                final CharSequence destiny[] = new CharSequence[(int)startLocations.getChildrenCount()];
-                                for(DataSnapshot endPoints: startLocations.getChildren()) {
-
-                                    destiny[i] = endPoints.getKey().toString();
-                                    i++;
-                                }
-
-
-
+                            Barcode barcode = barcodes.valueAt(0);
+                            if (!destination.equals(barcode.displayValue)) {
+                                //ToastText("This is not the destination");
                                 Intent intent = new Intent(QRActivity.this, Instructions.class);
-                                intent.putExtra("destinations", destiny);
-                                intent.putExtra("startPoint",startBarcode);
-                                intent.putExtra("justStarted",true);
+                                intent.putExtra("justStarted", false);
+                                intent.putExtra("destination", destination);
+                                intent.putExtra("startPoint", startPoint);
+                                //intent.putExtra("barcode" , barcode.displayValue);
                                 startActivity(intent);
+                            } else {
+                                //ToastText("Congratulations, you reached our destination");
+                                myDatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        mDestinations = snapshot.child("users").child(mAuth.getCurrentUser().getUid()).child("destinations").getValue().toString();
+                                        updateDestinations(destination);
+                                    }
 
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+
+                                });
+                                //this is where you will want to go to the comment activity
+                                Intent intent = new Intent(QRActivity.this, LocationComment.class);
+                                intent.putExtra("barcode", barcode.displayValue);
+                                intent.putExtra("destination", destination);
+                                intent.putExtra("startPoint", startPoint);
+                                intent.putExtra("justStarted", false);
+
+                                startActivity(intent);
                             }
-                        }
 
+                        } else {
+                            final String startBarcode = barcodes.valueAt(0).displayValue;
+                            //final CharSequence destinations[] = new CharSequence[5];
+                            for (DataSnapshot startLocations : data.child("routes").getChildren()) {
+                                if (startLocations.getKey().toString().equals(startBarcode)) {
+                                    int i = 0;
+                                    final CharSequence destiny[] = new CharSequence[(int) startLocations.getChildrenCount()];
+                                    for (DataSnapshot endPoints : startLocations.getChildren()) {
+
+                                        destiny[i] = endPoints.getKey().toString();
+                                        i++;
+                                    }
+
+
+                                    Intent intent = new Intent(QRActivity.this, Instructions.class);
+                                    intent.putExtra("destinations", destiny);
+                                    intent.putExtra("startPoint", startBarcode);
+                                    intent.putExtra("justStarted", true);
+                                    startActivity(intent);
+
+                                }
+                            }
+
+                        }
                     }
                 }
             }
